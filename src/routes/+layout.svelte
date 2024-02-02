@@ -1,9 +1,12 @@
 <script>
 	import autoAnimate from "@formkit/auto-animate";
-	import { IconAlphabetLatin, IconBook2, IconHome } from "@tabler/icons-svelte";
+	import IconAlphabetLatin from "~icons/tabler/AlphabetLatin.svelte";
+	import IconBook2 from "~icons/tabler/Book-2.svelte";
+	import IconHome from "~icons/tabler/Home.svelte";
 	import tippy from "tippy.js";
 	import "tippy.js/dist/tippy.css";
 	import "../app.css";
+	import "../fonts.css";
 </script>
 
 <div class="font-lexend bg-zinc-800 text-white min-h-screen h-full">
@@ -23,7 +26,7 @@
 				class="p-2 bg-zinc-700 rounded-lg group"
 				use:tippy={{ content: "Home", placement: "right" }}>
 				<IconHome
-					size={45}
+					height={45}
 					class="text-orange-500 group-hover:text-orange-400 transition-all" />
 			</a>
 			<a
@@ -31,7 +34,7 @@
 				class="p-2 bg-zinc-700 rounded-lg group"
 				use:tippy={{ content: "/tellraw generator", placement: "right" }}>
 				<IconAlphabetLatin
-					size={45}
+					height={45}
 					class="text-blue-500 group-hover:text-blue-400 transition-all" />
 			</a>
 			<a
@@ -39,7 +42,7 @@
 				class="p-2 bg-zinc-700 rounded-lg group"
 				use:tippy={{ content: "Book generator", placement: "right" }}>
 				<IconBook2
-					size={45}
+					height={45}
 					class="text-blue-500 group-hover:text-blue-400 transition-all" />
 			</a>
 		</div>

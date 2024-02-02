@@ -2,11 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-	font-family: Minecraft;
-	src: url("/Minecraft.otf");
-}
-
 .btn {
 	@apply p-1 hover:bg-zinc-800 rounded-md transition-all;
 }

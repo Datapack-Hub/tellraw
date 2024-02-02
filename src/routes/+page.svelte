@@ -1,12 +1,10 @@
 <script lang="ts">
-	import {
-		IconAlphabetLatin,
-		IconBook2,
-		IconFileZip,
-		IconMountain,
-		IconPalette,
-		IconSword,
-	} from "@tabler/icons-svelte";
+	import IconAlphabetLatin from "~icons/tabler/AlphabetLatin.svelte";
+	import IconBook2 from "~icons/tabler/Book-2.svelte";
+	import IconFileZip from "~icons/tabler/FileZip.svelte"
+	import IconMountain from "~icons/tabler/Mountain.svelte"
+	import IconPalette from "~icons/tabler/Palette.svelte"
+	import IconSword from "~icons/tabler/Sword.svelte"
 </script>
 
 <main class="flex items-center w-full h-full">
@@ -24,7 +22,7 @@
 			<div class="grid grid-cols-3 gap-2">
 				<div class="card">
 					<IconAlphabetLatin
-						size={35}
+						height={35}
 						class="text-blue-500 group-hover:text-blue-400 transition-all" />
 					<div>
 						<h1 class="text-lg font-semibold">/tellraw Generator</h1>
@@ -32,7 +30,7 @@
 				</div>
 				<div class="card">
 					<IconBook2
-						size={35}
+						height={35}
 						class="text-blue-500 group-hover:text-blue-400 transition-all" />
 					<div>
 						<h1 class="text-lg font-semibold">Book Generator</h1>
@@ -40,7 +38,7 @@
 				</div>
 				<div class="card">
 					<IconMountain
-						size={35}
+						height={35}
 						class="text-green-600 group-hover:text-green-500 transition-all" />
 					<div>
 						<h1 class="text-lg font-semibold">Biome Generator</h1>
@@ -48,7 +46,7 @@
 				</div>
 				<div class="card">
 					<IconSword
-						size={35}
+						height={35}
 						class="text-rose-600 group-hover:text-rose-500 transition-all" />
 					<div>
 						<h1 class="text-lg font-semibold">Loot Table Generator</h1>
@@ -56,7 +54,7 @@
 				</div>
 				<div class="card">
 					<IconPalette
-						size={35}
+						height={35}
 						class="text-rose-600 group-hover:text-rose-500 transition-all" />
 					<div>
 						<h1 class="text-lg font-semibold">Recipe Generator</h1>
@@ -64,7 +62,7 @@
 				</div>
 				<div class="card">
 					<IconFileZip
-						size={35}
+						height={35}
 						class="text-rose-600 group-hover:text-rose-500 transition-all" />
 					<div>
 						<h1 class="text-lg font-semibold">Template Generator</h1>
