@@ -26,24 +26,21 @@
 				class="p-2 bg-zinc-700 rounded-lg group"
 				use:tippy={{ content: "Home", placement: "right" }}>
 				<IconHome
-					height={45}
-					class="text-orange-500 group-hover:text-orange-400 transition-all" />
+					class="text-orange-500 group-hover:text-orange-400 transition-all text-3xl" />
 			</a>
 			<a
 				href="tellraw"
 				class="p-2 bg-zinc-700 rounded-lg group"
 				use:tippy={{ content: "/tellraw generator", placement: "right" }}>
 				<IconAlphabetLatin
-					height={45}
-					class="text-blue-500 group-hover:text-blue-400 transition-all" />
+					class="text-blue-500 group-hover:text-blue-400 transition-all text-3xl" />
 			</a>
 			<a
 				href="#book_generator_link"
 				class="p-2 bg-zinc-700 rounded-lg group"
 				use:tippy={{ content: "Book generator", placement: "right" }}>
 				<IconBook2
-					height={45}
-					class="text-blue-500 group-hover:text-blue-400 transition-all" />
+					class="text-blue-500 group-hover:text-blue-400 transition-all text-3xl" />
 			</a>
 		</div>
 		<div
