@@ -1,10 +1,22 @@
 <script lang="ts">
-    import {IconBold, IconCheck, IconClick, IconDeviceFloppy, IconItalic, IconLanguage, IconMouse, IconPalette, IconSquareFilled, IconStrikethrough, IconUnderline} from "@tabler/icons-svelte"
+    import IconBold from "~icons/tabler/Bold.svelte";
+    import IconCheck from "~icons/tabler/Check.svelte";
+    import IconClick from "~icons/tabler/Click.svelte";
+    import IconDeviceFloppy from "~icons/tabler/DeviceFloppy.svelte";
+    import IconItalic from "~icons/tabler/Italic.svelte";
+    import IconLanguage from "~icons/tabler/Language.svelte";
+    import IconMouse from "~icons/tabler/Mouse.svelte";
+    import IconPalette from "~icons/tabler/Palette.svelte";
+    import IconSquareFilled from "~icons/tabler/SquareFilled.svelte";
+    import IconStrikethrough from "~icons/tabler/Strikethrough.svelte";
+    import IconUnderline from "~icons/tabler/Underline.svelte";
     import {tippy} from 'svelte-tippy';
 
     var import_text: string;
     var edit_box: HTMLParagraphElement;
     var col: HTMLInputElement;
+    
+    var output: string | null = null
     
     function load(){
         edit_box.innerHTML = ""
@@ -82,27 +94,20 @@
         });
     }
 
-    interface TextSection {
-        text: string;
-        styles: CSSStyleDeclaration;
-    }
-
-    function getAllTextSectionsWithStyles(node: Node, textSections: TextSection[] = []): TextSection[] {
-        if (node.nodeType === Node.TEXT_NODE) {
-            // If the node is a text node, add its content and computed styles to the array
-            const styles = window.getComputedStyle(node.parentElement!);
-            textSections.push({
-                text: node.textContent?.trim() || '',
-                styles: styles,
-            });
-        } else if (node.nodeType === Node.ELEMENT_NODE) {
-            // If the node is an element node, recursively check its children
-            node.childNodes.forEach(child => {
-                getAllTextSectionsWithStyles(child, textSections);
-            });
+    function textNodesUnder(el: Node) {
+        const uniqueParents = new Set()
+        const children = [] // Type: Node[]
+        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
+        while(walker.nextNode()) {
+            let parent = walker.currentNode.parentElement
+            if(parent && !uniqueParents.has(parent)) {
+                uniqueParents.add(parent)
+                children.push(walker.currentNode)
+            }
         }
-        return textSections;
+        return children
     }
+    
 
     const rgba2hex = (rgba: string): string => {
         const match = rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);
@@ -111,25 +116,83 @@
         }
 
         const [r, g, b] = match.slice(1).map(n => parseInt(n, 10).toString(16).padStart(2, '0'));
-        return `#${r}${g}${b}`;
+
+        let out_hex = `#${r}${g}${b}`
+
+        var color = out_hex
+
+        switch(out_hex.toUpperCase()){
+            case "#AA0000":
+                color = "dark_red";
+                break;
+            case "#FF5555":
+                color = "red";
+                break;
+            case "#FFAA00":
+                color = "gold";
+                break;
+            case "#FFFF55":
+                color = "yellow";
+                break;
+            case "#00AA00":
+                color = "dark_green";
+                break;
+            case "#55FF55":
+                color = "green";
+                break;
+            case "#55FFFF":
+                color = "aqua";
+                break;
+            case "#00AAAA":
+                color = "dark_aqua";
+                break;
+            case "#0000AA":
+                color = "dark_blue";
+                break;
+            case "#5555FF":
+                color = "blue";
+                break;
+            case "#FF55FF":
+                color = "light_purple";
+                break;
+            case "#AA00AA":
+                color = "dark_purple";
+                break;
+            case "#FFFFFF":
+                color = "white";
+                break;
+            case "#AAAAAA":
+                color = "gray";
+                break;
+            case "#555555":
+                color = "dark_gray";
+                break;
+            case "#000000":
+                color = "black";
+                break;
+        }
+        return color;
     };
 
     function generate(){
-        var output: Array<any> = [""]
-        const all = getAllTextSectionsWithStyles(edit_box)
-        for (var item of all){
-            let out = {}
+        let parts = textNodesUnder(edit_box)
+        let output_array = []
+        for (var item of parts){
+            if(item.parentElement){
+                let style = getComputedStyle(item.parentElement)
+                let out = {}
 
-            out["text"] = item.text,
-            out["color"] = rgba2hex(item.styles.color)
+                out["text"] = item.textContent,
+                out["color"] = rgba2hex(style.color)
 
-            if(!item.styles.textDecoration.search("underline")) out["underlined"] = "true"
-            if(!item.styles.textDecoration.search("line-through")) out["strikethrough"] = "true"
+                if(!style.textDecoration.search("underline")) out["underlined"] = "true"
+                if(!style.textDecoration.search("line-through")) out["strikethrough"] = "true"
 
-            output.push(out)
-            
+                output_array.push(out)
+            }
         }
-        console.log(output)
+        output = JSON.stringify(output_array)
+
     }
     
     function customcolor(){
@@ -185,4 +248,12 @@
         <input class="rounded-lg bg-zinc-800 px-3 py-2 font-minecraft flex-grow" placeholder="Import..." bind:value={import_text}>
         <button class="rounded-md bg-orange-600 hover:bg-orange-500 transition-all px-3 py-2" on:click={load}>Import</button>
     </div>
+    {#if output}
+    <div class="mt-3">
+        <h1 class="text-lg font-semibold">Generated Command:</h1>
+        <div class="w-full bg-zinc-950 text-zinc-300 font-minecraft rounded-xl p-3">
+            /tellraw @a {output}
+        </div>
+    </div>
+    {/if}
 </main>
