@@ -96,9 +96,11 @@
     }
 
     function textNodesUnder(el: Node) {
+        el.normalize()
         const children = [] // Type: Node[]
         const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
         while(walker.nextNode()) {
+            walker.currentNode.parentElement?.normalize()
             let parent = walker.currentNode.parentElement
             if(parent) {
                 children.push(walker.currentNode)
@@ -173,8 +175,69 @@
         return color;
     };
 
+    interface TextDecorationResult {
+        underline: boolean;
+        strikethrough: boolean;
+    }
+
+    function getTextDecoration(element: HTMLElement | null): TextDecorationResult {
+        const result: TextDecorationResult = {
+            underline: false,
+            strikethrough: false,
+        };
+
+        if (!element) {
+            return result;
+        }
+
+        const computedStyle = window.getComputedStyle(element);
+        const textDecoration = computedStyle.textDecoration;
+
+        // Check if underline is present in the text-decoration
+        result.underline = textDecoration.includes("underline");
+
+        // Check if line-through is present in the text-decoration
+        result.strikethrough = textDecoration.includes("line-through");
+
+        // Recursively check the parent element
+        const parentResult = getTextDecoration(element.parentElement);
+
+        // Merge the results with the current element's results
+        return {
+            underline: result.underline || parentResult.underline,
+            strikethrough: result.strikethrough || parentResult.strikethrough,
+        };
+    }
+
+
+    function mergeWhitespaceTextNodes(nodes: Node[]): Node[] {
+        const output: Node[] = [];
+        let prevNode: Node | null = null;
+
+        for (let i =  0; i < nodes.length; i++) {
+            const node = nodes[i];
+            if (node.nodeType === Node.TEXT_NODE && node.textContent!.trim() === '') {
+                // If the node is a text node with only whitespace and there is a previous node,
+                // append the whitespace to the previous node's text content.
+                if (prevNode && prevNode.nodeType === Node.TEXT_NODE) {
+                    prevNode.textContent += node.textContent;
+                } else {
+                    // If there is no previous node, keep the current node as is.
+                    output.push(node);
+                }
+            } else {
+                // If the node is not a whitespace text node, add it to the output array.
+                output.push(node);
+                prevNode = node;
+            }
+        }
+
+        return output;
+    }
+
     function generate(){
         let parts = textNodesUnder(edit_box)
+        parts = mergeWhitespaceTextNodes(parts)
         let output_array = []
         for (var item of parts){
             if(item.parentElement){
@@ -183,14 +246,21 @@
 
                 out["text"] = item.textContent,
                 out["color"] = rgba2hex(style.color)
-                
-                if(!style.textDecoration.search("underline")) out["underlined"] = "true"
-                if(!style.textDecoration.search("line-through")) out["strikethrough"] = "true"
+
+                let deco = getTextDecoration(item.parentElement)
+                if(deco.underline) out["underlined"] = "true"
+                if(deco.strikethrough) out["strikethrough"] = "true"
+
+                if(Number(style.fontWeight) > 600) out["bold"] = "true"
 
                 output_array.push(out)
             }
         }
-        output = JSON.stringify(output_array)
+        const highlightedCode = hljs.highlight(
+            JSON.stringify(output_array),
+        { language: 'json' }
+        ).value
+        output = highlightedCode
 
     }
     
@@ -242,15 +312,20 @@
             <button class="p-1 hover:bg-orange-500 rounded-md transition-all bg-orange-600 flex items-center space-x-1"><IconUpload class="text-xl" /></button>
         </div>
     </div>
-    <div class="rounded-lg bg-zinc-800 px-3 py-2 font-minecraft h-96 text-lg overflow-y-auto w-full" contenteditable="true" bind:this={edit_box} on:input={generate}></div>
+    <div class="rounded-lg bg-zinc-800 px-3 py-2 font-minecraft h-96 text-lg overflow-y-auto w-full" contenteditable="true" bind:this={edit_box} on:input={generate}>
+        <div class="bg-blue-500/25 rounded-lg inline-flex items-center justify-self-center" contenteditable="false"><IconLanguage class="text-lg" /><span>some.translate.key</span></div> is my name
+    </div>
     <!-- <div class="flex space-x-2 items-center mt-3">
         <input class="rounded-lg bg-zinc-800 px-3 py-2 font-minecraft flex-grow" placeholder="Import..." bind:value={import_text}>
         <button class="rounded-md bg-orange-600 hover:bg-orange-500 transition-all px-3 py-2" on:click={load}>Import</button>
     </div> -->
     <div class="mt-3">
-        <div class="w-full bg-zinc-950 text-zinc-300 font-minecraft rounded-xl p-3">
+        <div class="w-full bg-zinc-950 font-minecraft rounded-xl p-3">
             {#if output}
-            /tellraw @a {output}
+            <code>
+                {@html output}
+            </code>
+            
             {:else}
             <span class="text-zinc-600">waiting for output...</span>
             {/if}
